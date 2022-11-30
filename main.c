@@ -55,6 +55,100 @@ void addProcess(Memory** head_ref, char *P_H , int base , int limit) {
     return;
 }
 
+/* function prototypes */
+struct Node* SortedMerge(Memory* a, Memory* b);
+void FrontBackSplit(Memory* source,
+                    Memory** frontRef, Memory** backRef);
+
+void trv(struct Node* head){
+    struct Node* temp = head;
+    temp->baseMemoryLocation = 0;
+    while(temp->next != NULL){
+        temp->next->baseMemoryLocation = temp->baseMemoryLocation + temp->limitMemoryLocation;
+        temp = temp-> next;
+    }
+
+}
+
+/* sorts the linked list by changing next pointers (not data) */
+void MergeSort(Memory** headRef)
+{
+    Memory* head = *headRef;
+    Memory* a;
+    Memory* b;
+
+    /* Base case -- length 0 or 1 */
+    if ((head == NULL) || (head->next == NULL)) {
+        return;
+    }
+
+    /* Split head into 'a' and 'b' sublists */
+    FrontBackSplit(head, &a, &b);
+
+    /* Recursively sort the sublists */
+    MergeSort(&a);
+    MergeSort(&b);
+
+    /* answer = merge the two sorted lists together */
+    *headRef = SortedMerge(a, b);
+    trv(head);
+}
+
+/* See https:// www.geeksforgeeks.org/?p=3622 for details of this
+function */
+Memory* SortedMerge(struct Node* a, struct Node* b)
+{
+    Memory* result = NULL;
+
+    /* Base cases */
+    if (a == NULL)
+        return (b);
+    else if (b == NULL)
+        return (a);
+
+    /* Pick either a or b, and recur */
+//    && (a->type == "H" && b->type != "H") || (a->type != "H" && b->type == "H")
+    if (strcmp(a->type, b->type) >= 0 && (a->type[0] != "H" && b->type[0] != "H")) {
+        result = a;
+        result->next = SortedMerge(a->next, b);
+    }
+    else{
+        result = b;
+        result->next = SortedMerge(a, b->next);
+    }
+    return (result);
+}
+
+/* UTILITY FUNCTIONS */
+/* Split the nodes of the given list into front and back halves,
+	and return the two lists using the reference parameters.
+	If the length is odd, the extra node should go in the front list.
+	Uses the fast/slow pointer strategy. */
+void FrontBackSplit(Memory * source,
+                    Memory ** frontRef, Memory** backRef)
+{
+    Memory* fast;
+    Memory* slow;
+    slow = source;
+    fast = source->next;
+
+    /* Advance 'fast' two nodes, and advance 'slow' one node */
+    while (fast != NULL) {
+        fast = fast->next;
+        if (fast != NULL) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+
+    /* 'slow' is before the midpoint in the list, so split it in two
+    at that point. */
+    *frontRef = source;
+    *backRef = slow->next;
+    slow->next = NULL;
+}
+
+
 void printOptions() {
     printf("\n\n------------------------------------------------------------\n");
     printf("---------Please select one of the following Options---------\n");
@@ -63,6 +157,14 @@ void printOptions() {
     printf("3.Compact The Inputs\n");
     printf("4. Print The Nodes\n");
     printf("5. Exit the Program\n");
+}
+
+void printList(struct Node* node)
+{
+    while (node != NULL) {
+        printf("%s ", node->type);
+        node = node->next;
+    }
 }
 
 int main()
@@ -98,24 +200,25 @@ int main()
                 printf("Operation Done...");
                 break;
             }
-            /**
-             * Case 2
-             */
+                /**
+                 * Case 2
+                 */
             case 2: {
                 mergeHoles(head);
                 printf("Operation Successful");
                 break;
             }
-            /**
-             * Case 3
-             */
+                /**
+                 * Case 3
+                 */
             case 3: {
-
+                MergeSort(&head);
+                mergeHoles(head);
                 break;
             }
-            /**
-             * Case 4
-             */
+                /**
+                 * Case 4
+                 */
             case 4:{
                 struct Node *current = head;
                 int i=1;
@@ -127,9 +230,9 @@ int main()
                 }
                 break;
             }
-            /**
-             * Case 5
-             */
+                /**
+                 * Case 5
+                 */
             case 5:{
                 printf("Thank You For The Time...");
                 break;
