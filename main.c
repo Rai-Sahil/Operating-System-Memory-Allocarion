@@ -119,11 +119,6 @@ Memory* SortedMerge(struct Node* a, struct Node* b)
     return (result);
 }
 
-/* UTILITY FUNCTIONS */
-/* Split the nodes of the given list into front and back halves,
-	and return the two lists using the reference parameters.
-	If the length is odd, the extra node should go in the front list.
-	Uses the fast/slow pointer strategy. */
 void FrontBackSplit(Memory * source,
                     Memory ** frontRef, Memory** backRef)
 {
@@ -132,7 +127,6 @@ void FrontBackSplit(Memory * source,
     slow = source;
     fast = source->next;
 
-    /* Advance 'fast' two nodes, and advance 'slow' one node */
     while (fast != NULL) {
         fast = fast->next;
         if (fast != NULL) {
@@ -141,8 +135,6 @@ void FrontBackSplit(Memory * source,
         }
     }
 
-    /* 'slow' is before the midpoint in the list, so split it in two
-    at that point. */
     *frontRef = source;
     *backRef = slow->next;
     slow->next = NULL;
@@ -159,17 +151,19 @@ void printOptions() {
     printf("5. Exit the Program\n");
 }
 
-void printList(struct Node* node)
-{
-    while (node != NULL) {
-        printf("%s ", node->type);
-        node = node->next;
+void changeHole(struct Node* head, int holeSize){
+    Memory *temp = head;
+    while(temp->next != NULL){
+        temp = temp->next;
     }
+    temp->limitMemoryLocation = holeSize;
 }
 
 int main()
 {
     Memory* head = NULL;
+    int i = 0;
+    int holeSize = 0;
 
     int userInput = 0;
     while(userInput != 5){
@@ -178,26 +172,52 @@ int main()
 
         switch(userInput){
             case 1:{
-                char *fileName;
-                fileName = (char*) malloc(100*sizeof(char*));
-                printf("Please Enter your file location: ");
-                scanf("%s", fileName);
-                FILE *file = fopen (fileName, "r");
+                if(i == 0){
+                    char *fileName;
+                    fileName = (char*) malloc(100*sizeof(char*));
+                    printf("Please Enter your file location: ");
+                    scanf("%s", fileName);
+                    FILE *file = fopen (fileName, "r");
 
-                if (file == NULL) {
-                    printf("File is Null");
-                    return 1;
-                }
+                    if (file == NULL) {
+                        printf("File is Null");
+                        return 1;
+                    }
+                    char *stringLimit;
+                    char *stringBase;
+                    char *stringType;
 
-                while(!feof(file))
-                {
-                    char s[5];
-                    int base;
-                    int limit;
-                    fscanf(file, "%s %d %d",s,&base,&limit);
-                    addProcess(&head, s, base, limit);
+                    while(!feof(file))
+                    {
+                        stringLimit = (char *) malloc(sizeof(char*));
+                        stringBase = (char *) malloc(sizeof(char*));
+                        char s[5];
+                        char base[64];
+                        char limit[64];
+                        fscanf(file, "%s %s %s",s,base,limit);
+                        int limitPtr = strtol(limit, &stringLimit, 10);
+                        int basePtr = strtol(base, &stringBase, 10);
+                        int typePtr = strtol(s, &stringType, 10);
+
+                        if(strlen(stringLimit) != 0 || strlen(stringBase) != 0 || basePtr < 0 || limitPtr <= 0){
+                            printf("ERROR: INVALID BASE OR LIMIT VALUE");
+                            return 0;
+                        }
+
+                        printf("%llu", strlen(stringType));
+
+                        if(strcmp(s, "H") == 0) {
+                            holeSize = holeSize + limitPtr;
+                        }
+
+                        addProcess(&head, s, basePtr, limitPtr);
+                    }
+
+                    i = i +1;
+                    printf("Operation Done...");
+                } else{
+                    printf("File Cannot be Inputed Again");
                 }
-                printf("Operation Done...");
                 break;
             }
                 /**
@@ -215,6 +235,7 @@ int main()
                 MergeSort(&head);
                 mergeHoles(head);
                 trv(head);
+                changeHole(head, holeSize);
                 break;
             }
                 /**
