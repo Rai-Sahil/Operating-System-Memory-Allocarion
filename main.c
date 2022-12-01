@@ -108,7 +108,8 @@ Memory* SortedMerge(struct Node* a, struct Node* b)
 
     /* Pick either a or b, and recur */
 //    && (a->type == "H" && b->type != "H") || (a->type != "H" && b->type == "H")
-    if (strcmp(a->type, b->type) >= 0 && (a->type[0] != "H" && b->type[0] != "H")) {
+//    (a->type[0] >= b->type[0])
+    if ((a->type[0] >= b->type[0])) {
         result = a;
         result->next = SortedMerge(a->next, b);
     }
