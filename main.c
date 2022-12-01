@@ -191,6 +191,7 @@ int main()
                     {
                         stringLimit = (char *) malloc(sizeof(char*));
                         stringBase = (char *) malloc(sizeof(char*));
+                        stringType = (char *) malloc(sizeof(char*));
                         char s[5];
                         char base[64];
                         char limit[64];
@@ -199,12 +200,15 @@ int main()
                         int basePtr = strtol(base, &stringBase, 10);
                         int typePtr = strtol(s, &stringType, 10);
 
+                        if(!strstr(s, "H") && !strstr(s, "p")){
+                            printf("ERROR: Neither a process nor a hole...");
+                            return 0;
+                        }
+
                         if(strlen(stringLimit) != 0 || strlen(stringBase) != 0 || basePtr < 0 || limitPtr <= 0){
                             printf("ERROR: INVALID BASE OR LIMIT VALUE");
                             return 0;
                         }
-
-                        printf("%llu", strlen(stringType));
 
                         if(strcmp(s, "H") == 0) {
                             holeSize = holeSize + limitPtr;
