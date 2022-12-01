@@ -91,7 +91,6 @@ void MergeSort(Memory** headRef)
 
     /* answer = merge the two sorted lists together */
     *headRef = SortedMerge(a, b);
-    trv(head);
 }
 
 /* See https:// www.geeksforgeeks.org/?p=3622 for details of this
@@ -215,6 +214,7 @@ int main()
             case 3: {
                 MergeSort(&head);
                 mergeHoles(head);
+                trv(head);
                 break;
             }
                 /**
